@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Survey Form Project</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .form-card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .form-card h2 {
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-size: 24px;
+    }
+
+    .form-card p {
+      color: #7f8c8d;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #34495e;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #dcdfe6;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #3498db;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background-color: #3498db;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+      background-color: #2980b9;
+    }
+
+    .status-msg {
+      margin-top: 15px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+
+    .status-msg.success {
+      color: #27ae60;
+      display: block;
+    }
+
+    .status-msg.error {
+      color: #e74c3c;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-card">
+    <h2>Student Survey Form</h2>
+    <p>Pakilagyan ng tamang impormasyon ang bawat patlang.</p>
+
+    <!-- PALITAN ANG ACTION URL SA IBABA NG IYONG FORMSPREE ENDPOINT -->
+    <form id="surveyForm" action="https://formspree.io/f/mppwkrda" method="POST">
+      
+      <div class="form-group">
+        <label for="surname">Surname (Apelyido)</label>
+        <input type="text" id="surname" name="Surname" placeholder="e.g. Dela Cruz" required>
+      </div>
+
+      <div class="form-group">
+        <label for="firstname">First Name (Pangalan)</label>
+        <input type="text" id="firstname" name="First Name" placeholder="e.g. Juan" required>
+      </div>
+
+      <div class="form-group">
+        <label for="middlename">Middle Name (Gitnang Pangalan)</label>
+        <input type="text" id="middlename" name="Middle Name" placeholder="e.g. Santos (o N/A)">
+      </div>
+
+      <div class="form-group">
+        <label for="height">Exact Height (cm)</label>
+        <input type="number" step="0.1" id="height" name="Height (cm)" placeholder="e.g. 165.5" required>
+      </div>
+
+      <div class="form-group">
+        <label for="weight">Exact Weight (kg)</label>
+        <input type="number" step="0.1" id="weight" name="Weight (kg)" placeholder="e.g. 58.2" required>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Submit Survey</button>
+      <div id="status" class="status-msg"></div>
+
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("surveyForm");
+    const status = document.getElementById("status");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
+      
+      const data = new FormData(form);
+      
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: data,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          status.className = "status-msg success";
+          status.textContent = "Maraming salamat! Naisumite nang maayos ang iyong sagot.";
+          form.reset();
+        } else {
+          const result = await response.json();
+          status.className = "status-msg error";
+          status.textContent = result.errors ? result.errors.map(error => error.message).join(", ") : "Nagkaroon ng problema sa pag-submit.";
+        }
+      } catch (error) {
+        status.className = "status-msg error";
+        status.textContent = "Nagkaroon ng error. Pakisubukan ulit.";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Survey";
+      }
+    });
+  </script>
+
+</body>
+</html>
